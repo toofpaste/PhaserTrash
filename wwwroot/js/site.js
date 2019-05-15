@@ -28,7 +28,9 @@ var GameScene = new Phaser.Class({
     this.load.image('bg5', 'assets/plx-5.png');
     this.load.spritesheet('character', 'assets/adventurer-Sheet.png',{frameWidth: 50, frameHeight: 37});
     this.load.spritesheet('character2', 'assets/adventurer-v1.5-Sheet.png',{frameWidth: 50, frameHeight: 37});
-    this.load.spritesheet('enemy', 'assets/caleb.png',{frameWidth: 16, frameHeight: 16});
+    this.load.spritesheet('enemy', 'assets/LightBandit_Spritesheet.png',{frameWidth: 48, frameHeight: 48});
+
+
   },
 
   create: function ()
@@ -80,10 +82,10 @@ var GameScene = new Phaser.Class({
         //this.enemy.body.setSize(14, 7, 31, 35);
         this.enemy.body.mass = 50;
         this.enemy.body.setFrictionX(-5);
-        this.enemy.body.setSize(17, 16, false);
-        this.enemy.body.setOffset(0, 0);
+        this.enemy.body.setSize(39, 46, false);
+        this.enemy.body.setOffset(6, 0);
         // var enemyBody = enemy.body.physics.add.staticGroup();
-    		this.player.setBounce(0.2);
+    		this.player.setBounce(0.1);
     		this.player.setCollideWorldBounds(true);
     		this.player.setScale(3);
     		//this.player.body.setSize(14, 7, 31, 35);
@@ -104,7 +106,7 @@ var GameScene = new Phaser.Class({
   		this.anims.create({
   			key: 'idle',
   			frames: this.anims.generateFrameNumbers('character', { start: 0, end: 3 }),
-  			frameRate: 2,
+  			frameRate: 6,
   			repeat: -1
   		});
 
@@ -117,13 +119,31 @@ var GameScene = new Phaser.Class({
       this.anims.create({
   			key: 'attack',
   			frames: this.anims.generateFrameNumbers('character2', { start: 93, end: 108 }),
-  			frameRate: 8,
+  			frameRate: 30,
   			repeat: -1
   		});
       this.anims.create({
   			key: 'idleEnemy',
-  			frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 5 }),
+  			frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 3 }),
+  			frameRate: 6,
+  			repeat: -1
+  		});
+      this.anims.create({
+  			key: 'hurtEnemy',
+  			frames: this.anims.generateFrameNumbers('enemy', { start: 32, end: 36 }),
   			frameRate: 2,
+  			repeat: 0
+  		});
+      this.anims.create({
+        key: 'runEnemy',
+        frames: this.anims.generateFrameNumbers('enemy', { start: 8, end: 15 }),
+        frameRate: 6,
+        repeat: -1
+      });
+      this.anims.create({
+  			key: 'attackEnemy',
+  			frames: this.anims.generateFrameNumbers('enemy', { start: 15, end: 23 }),
+  			frameRate: 9,
   			repeat: -1
   		});
 
@@ -153,21 +173,6 @@ var GameScene = new Phaser.Class({
 
     }, this);
   },
-//   accelerateTo: function (gameObject, x, y, speed, xSpeedMax, ySpeedMax)
-// {
-//     if (speed === undefined) { speed = 60; }
-//
-//     var angle = Math.atan2(y - gameObject.y, x - gameObject.x);
-//
-//     gameObject.body.acceleration.setToPolar(angle, speed);
-//
-//     if (xSpeedMax !== undefined && ySpeedMax !== undefined)
-//     {
-//         gameObject.body.maxVelocity.set(xSpeedMax, ySpeedMax);
-//     }
-//
-//     return angle;
-// },
   update: function (time, theta)
   {
 
@@ -182,9 +187,40 @@ var GameScene = new Phaser.Class({
     this.bg4.tilePositionX = this.cameras.main.scrollX * .8 / ratio;
     this.bg5.tilePositionX = this.cameras.main.scrollX * 1 / ratio;
     let onGround = (player.body.touching.down || player.body.blocked.down);
+    let enemyGround = (enemy.body.touching.down || enemy.body.blocked.down);
 		let moving = false;
+    let enemyMoving = false;
     let attack = false;
+    let isClose = (Math.abs(enemy.x - player.x) <= 185);
+    var howClose = Math.abs(enemy.x - player.x);
+    let isHeight = (Math.abs(player.y - enemy.y) <= 185);
+    if(((enemy.x - player.x  <= 500) && (enemy.x - player.x  >= 175) && enemyGround) && onGround){
+      enemy.setVelocityX(-100);
+      enemyMoving = true;
+      enemy.flipX = false;
+    }else if(enemy.x - player.x  <= 175){
+      enemyMoving = false;
 
+    }
+    if(((enemy.x - player.x  >= -500) && (enemy.x - player.x  <= -175) && enemyGround) && onGround){
+      enemy.setVelocityX(100);
+      enemy.flipX = true;
+      enemyMoving = true;
+    }else if(enemy.x - player.x  <= -175){
+      enemyMoving = false;
+
+    }
+    if(((enemy.x - player.x) <= 185 && (enemy.x - player.x) >= 1) && (player.y - enemy.y) <= 185 && (player.y - enemy.y) >= 1){
+      player.setVelocityX(0);
+      player.body.velocity.x = -600;
+      player.body.velocity.y = -800;
+      player.setGravityX(200);
+    }else if(((enemy.x - player.x) >= -185 && (enemy.x - player.x) <= 1) && (player.y - enemy.y) >= -185 && (player.y - enemy.y) <= 1){
+      player.setVelocityX(0);
+      player.body.velocity.x = 600;
+      player.body.velocity.y = 800;
+      player.setGravityX(-200);
+    }
     this.physics.world.collide(this.player, this.enemy, function(player, enemy){
         if(((enemy.body.touching.up && player.body.touching.down) || (!enemy.body.touching.right && !player.body.touching.left) || (enemy.body.touching.left && player.body.touching.right)) && !cursors.space.isDown){
             enemy.setGravityX(-200);
@@ -194,10 +230,12 @@ var GameScene = new Phaser.Class({
           enemy.setGravityX(200);
           enemy.setBounceX(0.01);
         }else if(((enemy.body.touching.left && player.body.touching.right) || (!enemy.body.touching.right && !player.body.touching.left)) && cursors.space.isDown){
+          enemy.setVelocityX(0);
           enemy.body.velocity.x = 300;
           enemy.body.velocity.y = -400;
           enemy.setGravityX(-200);
         } else if(((!enemy.body.touching.left && !player.body.touching.right) || (enemy.body.touching.right && player.body.touching.left)) && cursors.space.isDown){
+          enemy.setVelocityX(0);
           enemy.body.velocity.x = -300;
           enemy.body.velocity.y = -400;
           enemy.setGravityX(200);
@@ -225,22 +263,29 @@ var GameScene = new Phaser.Class({
         enemy.setVelocityX(0);
         enemy.setGravityX(0);
       }
+      if(Math.pow(player.body.velocity.x, 2) <= 1)
+      {
+        player.setVelocityX(0);
+        player.setGravityX(0);
+      }
+
+
 
 
     if (cursors.up.isDown && onGround) {
-  			player.setVelocityY(-330);
+  			player.setVelocityY(-530);
   		}
 
-  		if (cursors.left.isDown) {
-  			player.setVelocityX(-200); // move left
+  		if (cursors.left.isDown && onGround) {
+  			player.setVelocityX(-400); // move left
   			moving = true;
   			player.flipX = true;
   		}
-  		else if (cursors.right.isDown) {
-  			player.setVelocityX(200);
+  		else if (cursors.right.isDown && onGround) {
+  			player.setVelocityX(400);
   			moving = true;
   			player.flipX = false;
-  		} else {
+  		} else if(onGround){
   			player.setVelocityX(0);
   		}
       if(cursors.space.isDown && onGround)
@@ -257,6 +302,22 @@ var GameScene = new Phaser.Class({
         player.body.setOffset(14, 4);})
         attack = true;
       }
+      var i = 0;
+
+      if(onGround){
+        i = 1;
+      }else i = 2;
+
+      if (!enemyGround && !enemyMoving) {
+        enemy.anims.play('hurtEnemy', true);
+  		} else if(enemyMoving && enemyGround && !isClose){
+        enemy.anims.play('runEnemy', true);
+      }else if(((howClose <= 300) && enemyGround && isHeight) || i == 2){
+        enemy.setVelocityX(0);
+        enemy.anims.play('attackEnemy', true);
+      }else{
+        enemy.anims.play('idleEnemy', true);
+  		}
 
   		if (!onGround && !cursors.space.isDown) {
   			player.anims.play('jump', true);
@@ -266,7 +327,6 @@ var GameScene = new Phaser.Class({
   			player.anims.play('walk', true);
   		} else {
   			player.anims.play('idle', true);
-        enemy.anims.play('idleEnemy', true);
   		}
 
 
