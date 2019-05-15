@@ -12081,11 +12081,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/Guest/Desktop/PhaserTEst/PhaserTEst.csproj",
+      "projectUniqueName": "/Users/Guest/Desktop/Phaser3/PhaserTEst.csproj",
       "projectName": "PhaserTEst",
-      "projectPath": "/Users/Guest/Desktop/PhaserTEst/PhaserTEst.csproj",
+      "projectPath": "/Users/Guest/Desktop/Phaser3/PhaserTEst.csproj",
       "packagesPath": "/Users/Guest/.nuget/packages/",
-      "outputPath": "/Users/Guest/Desktop/PhaserTEst/obj/",
+      "outputPath": "/Users/Guest/Desktop/Phaser3/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
