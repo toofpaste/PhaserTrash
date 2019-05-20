@@ -5,6 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PhaserTEst.Models;
+using System.Collections;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
 
 namespace PhaserTEst.Controllers
 {
@@ -12,6 +18,14 @@ namespace PhaserTEst.Controllers
     {
         public IActionResult Index()
         {
+          string eCookie = Request.Cookies["umail"];
+          string pCookie = Request.Cookies["pword"];
+          string uCookie = Request.Cookies["uname"];
+          string i = eCookie;
+          string p = pCookie;
+          string u = uCookie;
+          User user = new User(i, p, u);
+          user.Save();
             return View();
         }
 

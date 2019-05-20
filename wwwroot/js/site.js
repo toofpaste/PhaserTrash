@@ -2,6 +2,9 @@ var sprite;
 let ratio = 720 / 216;
 let isHit = false;
 let enHit = false;
+localStorage.setItem("umail", "email@email.com");
+localStorage.setItem("pword", "password123");
+localStorage.setItem("uname", "xXusernameXx");
 var GameScene = new Phaser.Class({
 
   Extends: Phaser.Scene,
@@ -209,7 +212,6 @@ var GameScene = new Phaser.Class({
   },
   update: function (time, theta)
   {
-
     var BKey = this.input.keyboard.addKey('B');
     var cursors = this.cursors;
     var player = this.player;
